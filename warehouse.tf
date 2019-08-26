@@ -5,7 +5,7 @@ resource "aws_redshift_cluster" "default" {
   master_password    = var.redshift_password
   node_type          = "dc2.large"
   cluster_type       = "single-node"
-  //iam_roles = [aws_iam_role.redshift_role.arn]
+  iam_roles = [aws_iam_role.redshift_role.arn]
   vpc_security_group_ids = [aws_security_group.allow_access_to_redshift_from_vpn.id]
   skip_final_snapshot = true
 }
