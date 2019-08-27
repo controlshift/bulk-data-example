@@ -1,5 +1,4 @@
 let https = require('https');
-let url = require('url');
 let AWS = require('aws-sdk');
 'use strict';
 
