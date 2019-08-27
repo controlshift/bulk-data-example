@@ -46,6 +46,10 @@ resource "aws_api_gateway_method_response" "response_200" {
   resource_id = aws_api_gateway_resource.webhook.id
   http_method = aws_api_gateway_method.request_method.http_method
   status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+  }
 }
 
 resource "aws_api_gateway_integration_response" "receiver" {
@@ -53,13 +57,17 @@ resource "aws_api_gateway_integration_response" "receiver" {
   resource_id = aws_api_gateway_resource.webhook.id
   http_method = aws_api_gateway_method.request_method.http_method
   status_code = aws_api_gateway_method_response.response_200.status_code
+
+  response_templates = {
+    "application/json" = ""
+  }
 }
 
 resource "aws_api_gateway_integration" "request_method_integration" {
   rest_api_id = aws_api_gateway_rest_api.receiver.id
   resource_id = aws_api_gateway_resource.webhook.id
   http_method = "POST"
-  type        = "AWS"
+  type        = "AWS_PROXY"
   uri         = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.receiver_lambda.arn}/invocations"
   # AWS lambdas can only be invoked with the POST method
   integration_http_method = "POST"

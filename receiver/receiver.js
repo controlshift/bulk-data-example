@@ -1,72 +1,49 @@
-var https = require('https');
-var url = require('url');
-var AWS = require('aws-sdk');
+let https = require('https');
+let url = require('url');
+let AWS = require('aws-sdk');
+'use strict';
 
-function csvReceiver(downloadUrl, eventContext, webhookJSON){
-    var targetBucket = process.env.S3_BUCKET, // receiver bucket name
-        s3 = new AWS.S3(),
-        firstLineRemoved = false,
-        csvData = '',
-        context = eventContext,
-        receivedJSON = webhookJSON;
+let targetBucket = process.env.S3_BUCKET, // receiver bucket name
+  s3 = new AWS.S3();
 
-    var parseFileName = function(url_string){
-        path = url.parse(url_string).pathname
-        return path.substr(path.lastIndexOf('/')+1)
-    }
+function processCsv(downloadUrl, table) {
+    console.log("Processing: " + downloadUrl);
+    copyToS3(downloadUrl, table +'.csv', function(res){
+        console.log(res);
+        sendResponse({'hello': 'world'})
+    });
+}
 
-    // Remove Headers
-    var removeFirstLine = function(chunk){
-        if(firstLineRemoved){
-            csvData += chunk;
-        }else{
-            var buffer = chunk.toString();
-            if (buffer.indexOf('\n') !== -1) {
-                csvData += chunk.slice(chunk.indexOf('\n') + 1);
-                firstLineRemoved = true;
-                buffer = null;
-            }
+function copyToS3(url, key, callback) {
+    https.get(url, function onResponse(res) {
+        if (res.statusCode >= 300) {
+            return callback(new Error('error ' + res.statusCode + ' retrieving ' + url));
         }
-    }
+        s3.upload({Bucket: targetBucket, Key: key, Body: res}, callback);
+    })
+      .on('error', function onError(err) {
+          return callback(err);
+      });
+}
 
-    var uploadCsv = function(){
-        var upload_details = {Bucket: targetBucket, Key: fileName, Body: csvData};
-        s3.upload(upload_details, function(err, data) {
-            if (err){
-                // an error occurred
-                console.log(err, err.stack);
-                context.fail(err);
-            }else{
-                // successful response
-                context.succeed({"status": "success", "payload": receivedJSON});
-            }
-        });
-    }
-
-    return {
-        processCsv: function(){
-            fileName = parseFileName(downloadUrl);
-            https.get(downloadUrl, function(httpResponse) {
-                httpResponse.on('data', function(chunk) {
-                    removeFirstLine(chunk);
-                });
-                httpResponse.on('end', function() {
-                    console.log(httpResponse);
-                    uploadCsv();
-                });
-            });
-        }
-    }
+function sendResponse(body) {
+    let response =  {
+        isBase64Encoded: false,
+        statusCode: 200,
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    };
+    console.log("response: " + JSON.stringify(response));
+    return response;
 }
 
 // Lambda event Handler
-exports.handler = function(event, context) {
-    var receivedJSON = JSON.stringify(event, null, 2);
+exports.handler = async (event) => {
+    let receivedJSON = JSON.parse(event.body);
     console.log('Received event:', receivedJSON);
-    if(event.type === 'data.full_table_exported'){
-        let receiver = new csvReceiver(event.data.url, context, receivedJSON);
-        receiver.processCsv();
-    }else{
-        context.succeed({"status": "skipped", "payload": receivedJSON});
+    if(receivedJSON.type === 'data.full_table_exported'){
+        processCsv(receivedJSON.data.url, receivedJSON.data.table);
+    } else {
+        sendResponse({"status": "skipped", "payload": receivedJSON});
     }
 };

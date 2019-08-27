@@ -55,3 +55,25 @@ resource "aws_iam_role_policy" "lambda_accesses_code_bucket" {
   role = aws_iam_role.receiver_lambda_role.id
   policy = data.aws_iam_policy_document.lambda_execution_policy.json
 }
+
+
+resource "aws_iam_role" "api_gateway_role" {
+  name = "APIGatewayRole"
+  assume_role_policy = data.aws_iam_policy_document.gateway_assume_role.json
+}
+
+data "aws_iam_policy_document" "gateway_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+      identifiers = ["apigateway.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "gateway_cloudwatch_logging" {
+  role       = aws_iam_role.api_gateway_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
