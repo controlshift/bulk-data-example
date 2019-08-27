@@ -14,11 +14,6 @@ data "aws_iam_policy_document" "redshift_assume_role" {
   }
 }
 
-resource "aws_iam_role" "receiver_lambda_role" {
-  name = "ReceiverLambdaRole"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
 data "aws_iam_policy_document" "lambda_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -30,7 +25,12 @@ data "aws_iam_policy_document" "lambda_assume_role" {
   }
 }
 
-data "aws_iam_policy_document" "lambda_execution_policy" {
+resource "aws_iam_role" "receiver_lambda_role" {
+  name = "ReceiverLambdaRole"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "receiver_execution_policy" {
   # allow the lambda to write cloudwatch logs
   statement {
     effect = "Allow"
@@ -53,7 +53,7 @@ data "aws_iam_policy_document" "lambda_execution_policy" {
 resource "aws_iam_role_policy" "lambda_accesses_code_bucket" {
   name = "AllowsReceiverExecuton"
   role = aws_iam_role.receiver_lambda_role.id
-  policy = data.aws_iam_policy_document.lambda_execution_policy.json
+  policy = data.aws_iam_policy_document.receiver_execution_policy.json
 }
 
 
@@ -76,4 +76,47 @@ data "aws_iam_policy_document" "gateway_assume_role" {
 resource "aws_iam_role_policy_attachment" "gateway_cloudwatch_logging" {
   role       = aws_iam_role.api_gateway_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
+
+resource "aws_iam_role" "loader_lambda_role" {
+  name = "LoaderLambdaRole"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role_policy" "lambda_loads_tables" {
+  name = "AllowsReceiverExecuton"
+  role = aws_iam_role.loader_lambda_role.id
+  policy = data.aws_iam_policy_document.loader_execution_policy.json
+}
+
+
+data "aws_iam_policy_document" "loader_execution_policy" {
+  # allow the lambda to write cloudwatch logs
+  statement {
+    effect = "Allow"
+    actions = [
+      "dynamodb:DeleteItem",
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:ListTables",
+      "dynamodb:PutItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:UpdateItem",
+      "sns:GetEndpointAttributes",
+      "sns:GetSubscriptionAttributes",
+      "sns:GetTopicAttributes",
+      "sns:ListTopics",
+      "sns:Publish",
+      "sns:Subscribe",
+      "sns:Unsubscribe",
+      "s3:Get*",
+      "s3:Put*",
+      "s3:List*",
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GetKeyPolicy"
+    ]
+    resources = ["*"]
+  }
 }
