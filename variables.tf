@@ -1,3 +1,4 @@
+variable "aws_region" {}
 variable "redshift_password" {}
 variable "redshift_username" {}
 variable "receiver_bucket_name" {}
