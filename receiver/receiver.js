@@ -9,7 +9,7 @@ function processCsv(downloadUrl, table) {
     console.log("Processing: " + downloadUrl);
     copyToS3(downloadUrl, table +'.csv', function(res){
         console.log(res);
-        sendResponse({'hello': 'world'})
+        sendResponse({"status": "processed"})
     });
 }
 
@@ -29,7 +29,7 @@ function sendResponse(body) {
     let response =  {
         isBase64Encoded: false,
         statusCode: 200,
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', 'x-controlshift-processed': '1'},
         body: JSON.stringify(body)
     };
     console.log("response: " + JSON.stringify(response));
@@ -41,8 +41,8 @@ exports.handler = async (event) => {
     let receivedJSON = JSON.parse(event.body);
     console.log('Received event:', receivedJSON);
     if(receivedJSON.type === 'data.full_table_exported'){
-        processCsv(receivedJSON.data.url, receivedJSON.data.table);
+        await processCsv(receivedJSON.data.url, receivedJSON.data.table);
     } else {
-        sendResponse({"status": "skipped", "payload": receivedJSON});
+        return sendResponse({"status": "skipped", "payload": receivedJSON});
     }
 };

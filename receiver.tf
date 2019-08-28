@@ -73,14 +73,13 @@ resource "aws_api_gateway_integration" "request_method_integration" {
   integration_http_method = "POST"
 }
 
-# The /*/*/* part allows invocation from any stage, method and resource path
-# within API Gateway REST API.
+# The * part allows invocation from any stage within API Gateway REST API.
 resource "aws_lambda_permission" "allow_api_gateway" {
   function_name = aws_lambda_function.receiver_lambda.function_name
   statement_id  = "AllowExecutionFromApiGateway"
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.receiver.execution_arn}/production/POST/webhook"
+  source_arn    = "${aws_api_gateway_rest_api.receiver.execution_arn}/*/POST/webhook"
 }
 
 # for now, there is only one deployment

@@ -1,0 +1,21 @@
+{
+  "s3Prefix": {"S": "${s3_bucket}/signatures"},
+  "loadClusters": {"L": [
+    {"M": {
+      "clusterEndpoint":  {"S": "${redshift_endpoint}"},
+      "clusterPort": {"N": "${redshift_port}"},
+      "connectUser": {"S": "${redshift_username}" },
+      "connectPassword": {"S": "${redshift_password}" },
+      "truncateTarget": {"BOOL": true},
+      "useSSL": {"BOOL": false}
+    }}],
+
+  "dataFormat": {"S": "CSV"},
+  "csvDelimiter": {"S": ","},
+  "ignoreCsvHeader": {"BOOL": false},
+  "manifestBucket": {"S": "${manifest_bucket}"},
+  "manifestPrefix": {"S": "${manifest_prefix}"},
+  "failedManifestPrefix": {"S": "${failed_manifest_prefix}"},
+  "batchSize": {"N": "3"}
+  }
+}
