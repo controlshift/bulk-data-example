@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "receiver" {
     }
   }
   tags = {
-    Name        = "ControlShift dumps CSVs here"
+    Name = "ControlShift dumps CSVs here"
   }
 }
 
@@ -25,7 +25,7 @@ resource "aws_s3_bucket" "manifest" {
     }
   }
   tags = {
-    Name  = "ControlShift puts import manifests here"
+    Name = "ControlShift puts import manifests here"
   }
 }
 

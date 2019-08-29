@@ -5,3 +5,4 @@ provider "aws" {
 
 provider "archive" { }
 provider "template" { }
+provider "random" { }

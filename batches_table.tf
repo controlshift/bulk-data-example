@@ -15,7 +15,7 @@ resource "aws_dynamodb_table" "batches" {
   }
 
   attribute {
-    name = "s3prefix"
+    name = "s3Prefix"
     type = "S"
   }
 
@@ -24,14 +24,14 @@ resource "aws_dynamodb_table" "batches" {
     type = "N"
   }
 
-  hash_key = "s3prefix"
+  hash_key = "s3Prefix"
   range_key = "batchId"
 
   global_secondary_index {
     name = "LambdaRedshiftBatchStatus"
     hash_key = "status"
     range_key = "lastUpdate"
-    projection_type    = "ALL"
+    projection_type = "ALL"
     read_capacity  = 1
     write_capacity = 5
   }

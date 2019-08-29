@@ -6,11 +6,13 @@ const AWS = require('aws-sdk');
 const targetBucket = process.env.S3_BUCKET; // receiver bucket name
 const s3 = new AWS.S3();
 
-async function processCsv(downloadUrl, table) {
+async function processCsv(downloadUrl, table, kind) {
     console.log("Processing: " + downloadUrl);
 
     try {
-      await copyToS3(downloadUrl, table + '.csv')
+      const today = new Date();
+      const key = `${kind}/${table}/${today.getFullYear()}/${today.getMonth()}/${today.getDate()}/${today.getHours()}-${today.getMinutes()}/table.csv`;
+      await copyToS3(downloadUrl, key);
       console.log("Successfully copied")
     }
     catch(err){
@@ -56,7 +58,7 @@ exports.handler = async (event) => {
     let receivedJSON = JSON.parse(event.body);
     console.log('Received event:', receivedJSON);
     if(receivedJSON.type === 'data.full_table_exported'){
-        return processCsv(receivedJSON.data.url, receivedJSON.data.table);
+        return processCsv(receivedJSON.data.url, receivedJSON.data.table, 'full');
     } else {
         return Promise.resolve(sendResponse({"status": "skipped", "payload": receivedJSON}));
     }

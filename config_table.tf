@@ -30,5 +30,10 @@ data "template_file" "loader_config_item" {
     manifest_bucket = aws_s3_bucket.manifest.bucket
     manifest_prefix = var.manifest_prefix
     failed_manifest_prefix = var.failed_manifest_prefix
+    current_batch = random_id.current_batch.b64_url
   }
+}
+
+resource "random_id" "current_batch" {
+  byte_length = 16
 }
