@@ -20,7 +20,7 @@ resource "aws_security_group" "allow_access_to_redshift_from_vpn" {
     from_port   = 5439
     to_port     = 5439
     protocol    = "TCP"
-    cidr_blocks = ["52.2.141.10/32"]
+    cidr_blocks = ["52.2.141.10/32", "0.0.0.0/0"]
   }
 
   egress {

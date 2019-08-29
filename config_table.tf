@@ -25,7 +25,7 @@ data "template_file" "loader_config_item" {
     redshift_endpoint = aws_redshift_cluster.default.endpoint
     redshift_port = aws_redshift_cluster.default.port
     redshift_username = aws_redshift_cluster.default.master_username
-    redshift_password = aws_redshift_cluster.default.master_password
+    redshift_password = aws_kms_ciphertext.redshift_password.ciphertext_blob
     s3_bucket = aws_s3_bucket.receiver.bucket
     manifest_bucket = aws_s3_bucket.manifest.bucket
     manifest_prefix = var.manifest_prefix
@@ -37,3 +37,23 @@ data "template_file" "loader_config_item" {
 resource "random_id" "current_batch" {
   byte_length = 16
 }
+
+resource "aws_kms_ciphertext" "redshift_password" {
+  key_id = aws_kms_key.lambda_config.key_id
+  context = {
+    module = "AWSLambdaRedshiftLoader",
+    region = var.aws_region
+  }
+plaintext = aws_redshift_cluster.default.master_password
+}
+
+resource "aws_kms_alias" "lambda_alias" {
+  name = "alias/LambaRedshiftLoaderKey"
+  target_key_id = aws_kms_key.lambda_config.key_id
+}
+
+resource "aws_kms_key" "lambda_config" {
+  description = "Lambda Redshift Loader Master Encryption Key"
+  is_enabled  = true
+}
+
