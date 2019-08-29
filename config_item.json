@@ -14,7 +14,7 @@
 
   "dataFormat": {"S": "CSV"},
   "csvDelimiter": {"S": ","},
-  "ignoreCsvHeader": {"BOOL": false},
+  "ignoreCsvHeader": {"BOOL": true},
   "manifestBucket": {"S": "${manifest_bucket}"},
   "manifestKey": {"S": "${manifest_prefix}"},
   "failedManifestKey": {"S": "${failed_manifest_prefix}"},
