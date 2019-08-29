@@ -1,28 +1,43 @@
-let https = require('https');
-let AWS = require('aws-sdk');
 'use strict';
 
-let targetBucket = process.env.S3_BUCKET, // receiver bucket name
-  s3 = new AWS.S3();
+const https = require('https');
+const AWS = require('aws-sdk');
 
-function processCsv(downloadUrl, table) {
+const targetBucket = process.env.S3_BUCKET; // receiver bucket name
+const s3 = new AWS.S3();
+
+async function processCsv(downloadUrl, table) {
     console.log("Processing: " + downloadUrl);
-    copyToS3(downloadUrl, table +'.csv', function(res){
-        console.log(res);
-        sendResponse({"status": "processed"})
-    });
+
+    try {
+      await copyToS3(downloadUrl, table + '.csv')
+      console.log("Successfully copied")
+    }
+    catch(err){
+      console.log(`Failed: ${err.message}`)
+    }
+    finally{
+      return sendResponse({"status": "processed"})
+    }
 }
 
-function copyToS3(url, key, callback) {
+function copyToS3(url, key) {
+  return new Promise(function(resolve, reject){
     https.get(url, function onResponse(res) {
-        if (res.statusCode >= 300) {
-            return callback(new Error('error ' + res.statusCode + ' retrieving ' + url));
+      if (res.statusCode >= 300) {
+        reject(new Error('error ' + res.statusCode + ' retrieving ' + url));
+      }
+      s3.upload({Bucket: targetBucket, Key: key, Body: res}, function(err, data){
+        if(err){
+          reject(err)
         }
-        s3.upload({Bucket: targetBucket, Key: key, Body: res}, callback);
+        resolve(data)
+      });
     })
       .on('error', function onError(err) {
-          return callback(err);
+        reject(err);
       });
+  })
 }
 
 function sendResponse(body) {
@@ -41,8 +56,8 @@ exports.handler = async (event) => {
     let receivedJSON = JSON.parse(event.body);
     console.log('Received event:', receivedJSON);
     if(receivedJSON.type === 'data.full_table_exported'){
-        await processCsv(receivedJSON.data.url, receivedJSON.data.table);
+        return processCsv(receivedJSON.data.url, receivedJSON.data.table);
     } else {
-        return sendResponse({"status": "skipped", "payload": receivedJSON});
+        return Promise.resolve(sendResponse({"status": "skipped", "payload": receivedJSON}));
     }
 };
