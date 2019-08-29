@@ -8,7 +8,7 @@
       "connectPassword": {"S": "${redshift_password}" },
       "truncateTarget": {"BOOL": true},
       "useSSL": {"BOOL": false}
-    }}],
+    }}]},
 
   "dataFormat": {"S": "CSV"},
   "csvDelimiter": {"S": ","},
@@ -17,5 +17,4 @@
   "manifestPrefix": {"S": "${manifest_prefix}"},
   "failedManifestPrefix": {"S": "${failed_manifest_prefix}"},
   "batchSize": {"N": "3"}
-  }
 }
