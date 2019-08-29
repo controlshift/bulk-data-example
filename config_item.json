@@ -3,6 +3,7 @@
   "loadClusters": {"L": [
     {"M": {
       "clusterEndpoint":  {"S": "${redshift_endpoint}"},
+      "clusterDB": {"S":  "${redshift_database_name}"},
       "clusterPort": {"N": "${redshift_port}"},
       "connectUser": {"S": "${redshift_username}" },
       "connectPassword": {"S": "${redshift_password}" },

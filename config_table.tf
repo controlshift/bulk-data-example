@@ -22,7 +22,8 @@ resource "aws_dynamodb_table_item" "load_signatures" {
 data "template_file" "loader_config_item" {
   template = "${file("${path.module}/config_item.json")}"
   vars = {
-    redshift_endpoint = aws_redshift_cluster.default.endpoint
+    redshift_endpoint = aws_redshift_cluster.default.dns_name
+    redshift_database_name: aws_redshift_cluster.default.database_name
     redshift_port = aws_redshift_cluster.default.port
     redshift_username = aws_redshift_cluster.default.master_username
     redshift_password = aws_kms_ciphertext.redshift_password.ciphertext_blob
