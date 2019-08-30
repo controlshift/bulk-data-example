@@ -6,7 +6,7 @@ require 'byebug'
 
 def normalize_types(type)
   if %w(hstore json jsonb).include?(type)
-    'varchar'
+    'CHARACTER VARYING(max)'
   else
     type
   end
