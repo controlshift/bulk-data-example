@@ -11,6 +11,17 @@ resource "aws_s3_bucket" "receiver" {
   tags = {
     Name = "ControlShift dumps CSVs here"
   }
+
+  # expire the ingested CSVs 5 days after they have been processed to save disk space while providing enough
+  # time to analyze things that might have gone wrong.
+  lifecycle_rule {
+    id      = "expire-csvs"
+    enabled = true
+
+    expiration {
+      days = 5
+    }
+  }
 }
 
 
