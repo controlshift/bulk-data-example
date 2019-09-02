@@ -5,7 +5,7 @@ require 'json'
 require 'byebug'
 
 def normalize_types(type)
-  if %w(hstore json jsonb).include?(type)
+  if %w(hstore json jsonb text).include?(type)
     'CHARACTER VARYING(max)'
   else
     type
