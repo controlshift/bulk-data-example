@@ -1,4 +1,4 @@
-# Bulk Data API Redshift Pipeline
+## Bulk Data API Redshift Pipeline
 A [Terraform](https://www.terraform.io/) plan for implementing a data ETL pipeline from [ControlShift](https://www.controlshiftlabs.com) to [Amazon Redshift.](https://aws.amazon.com/redshift/)
 
 The output of this plan is a replica of all of the tables that underlie your ControlShift instance in Redshift which allows
@@ -27,8 +27,22 @@ The resources created include:
 - Use of [aws-vault](https://github.com/99designs/aws-vault) or a similar tool for using AWS secrets securely. 
 - The `terraform` command line tool. [Download](https://www.terraform.io/downloads.html) 
 
+### Setup Tables in Redshift
+
+For the ingest process to work correctly, tables that match the output of the ControlShift Bulk Data API must be setup
+in Redshift first. We've provided a create_tables.rb script that will use the [ControlShift 
+Bulk Data Schema API](https://developers.controlshiftlabs.com/#bulk-data-schema) to generate `CREATE TABLE` DDL statements 
+that you'll need to run to populate the tables for ingest.
+
+First generate the DDL statements, and then apply them manually in your Redshift environment.
+```
+create_table.rb > tables.sql
+```
 
 ### Terraform Variables
+
+Terraform input variables are defined in variables.tf. You'll want to create your own `terraform.tfvars` file with the 
+correct values for your specific environment. 
 
 Name | Description
 ------------ | -------------
@@ -40,3 +54,36 @@ manifest_bucket_name | Your S3 bucket name to store manifests of ingests process
 manifest_prefix | A file prefix that will be used for manifest logs on success
 failed_manifest_prefix | A file prefix that will be used for manifest logs on failure
 controlshift_hostname | The hostname of your ControlShift instance. Likely to be something like action.myorganization.org
+
+
+### Run Terraform
+
+You'll need: 
+
+- AWS Credentials with rather broad permissions in your environment.
+- AWS restricts certain IAM operations this terraform plan uses to credentials that have been authenticated with MFA. 
+As a result using `aws-vault` or a similar tool to assume a role with the correct permissions, protected by MFA is probably necessary. 
+
+Check out a copy of this repository locally, and then in the project directory:
+
+```bash
+# download the terraform dependencies and initialize the directory
+terraform init
+# use aws-vault to generate temporary AWS session credentials using the bulk-data profile and then use them to apply the plan
+aws-vault exec bulk-data -- terraform apply
+```
+
+The output of the terraform plan is a Webhook URL. You'll need to configure this in your instance of the ControlShift platform
+via Settings > Integrations > Webhooks.
+
+Once the webhook is configured it should populate the tables within your Redshift instance nightly. Alternatively, you can use
+the "Test Ingest" feature to trigger a full-table refresh on demand from the ControlShift web UI. 
+
+### Logs and Debugging
+
+The pipeline logs its activity several places that are useful for debugging. 
+
+- In CloudWatch Logs of Lambda and S3 activity. 
+- In DynamoDB tables for each manifest.
+- In Redshift, in the Loads tab of your datawarehouse instance. 
+- In each manifest load whose results stored in S3. 

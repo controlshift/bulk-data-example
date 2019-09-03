@@ -14,7 +14,7 @@ def normalize_types(type)
 end
 
 
-uri = URI('https://sign.moveon.org/api/bulk_data/schema.json')
+uri = URI('https://demo.controlshiftlabs.com/api/bulk_data/schema.json')
 json = Net::HTTP.get(uri)
 tables = JSON.parse(json)['tables']
 
