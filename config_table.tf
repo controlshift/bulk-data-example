@@ -65,11 +65,11 @@ resource "aws_kms_key" "lambda_config" {
 }
 
 data "http" "bulk_data_schemas" {
-  url = "https://${controlshift_hostname}/api/bulk_data/schema.json"
+  url = "https://${var.controlshift_hostname}/api/bulk_data/schema.json"
 }
 
 data "http" "column_list" {
   for_each = toset([for table in jsondecode(data.http.bulk_data_schemas.body)["tables"] : table["table"]["name"]])
 
-  url = "https://${controlshift_hostname}/api/bulk_data/schema/columns?table=${each.key}"
+  url = "https://${var.controlshift_hostname}/api/bulk_data/schema/columns?table=${each.key}"
 }
