@@ -26,3 +26,17 @@ The resources created include:
 - Familiarity with Amazon Web Services, Redshift, and Terraform
 - Use of [aws-vault](https://github.com/99designs/aws-vault) or a similar tool for using AWS secrets securely. 
 - The `terraform` command line tool. [Download](https://www.terraform.io/downloads.html) 
+
+
+### Terraform Variables
+
+Name | Description
+------------ | -------------
+aws_region | The AWS Region to use. Should match the location of your Redshift instance
+redshift_username | Redshift Username to use for database loads
+redshift_password | Redshift Password to use for database loads
+receiver_bucket_name | Your S3 bucket name ingest CSVs will be stored in. Terraform will create this bucket for you. Must be globally unique.
+manifest_bucket_name | Your S3 bucket name to store manifests of ingests processed in. Terraform will create this bucket for you. Must be globally unique.
+manifest_prefix | A file prefix that will be used for manifest logs on success
+failed_manifest_prefix | A file prefix that will be used for manifest logs on failure
+controlshift_hostname | The hostname of your ControlShift instance. Likely to be something like action.myorganization.org
