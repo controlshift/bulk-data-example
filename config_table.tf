@@ -13,15 +13,20 @@ resource "aws_dynamodb_table" "loader_config" {
 }
 
 resource "aws_dynamodb_table_item" "load_signatures" {
+  for_each = toset([for table in jsondecode(data.http.bulk_data_schemas.body)["tables"] : table["table"]["name"]])
+
   table_name = aws_dynamodb_table.loader_config.name
   hash_key   = aws_dynamodb_table.loader_config.hash_key
 
-  item = data.template_file.loader_config_item.rendered
+  item = data.template_file.loader_config_item[each.key].rendered
 }
 
 data "template_file" "loader_config_item" {
+  for_each = toset([for table in jsondecode(data.http.bulk_data_schemas.body)["tables"] : table["table"]["name"]])
+
   template = "${file("${path.module}/config_item.json")}"
   vars = {
+    bulk_data_table = each.key
     redshift_endpoint = aws_redshift_cluster.default.dns_name
     redshift_database_name: aws_redshift_cluster.default.database_name
     redshift_port = aws_redshift_cluster.default.port
@@ -32,6 +37,7 @@ data "template_file" "loader_config_item" {
     manifest_prefix = var.manifest_prefix
     failed_manifest_prefix = var.failed_manifest_prefix
     current_batch = random_id.current_batch.b64_url
+    column_list = data.http.column_list[each.key].body
   }
 }
 
@@ -45,7 +51,7 @@ resource "aws_kms_ciphertext" "redshift_password" {
     module = "AWSLambdaRedshiftLoader",
     region = var.aws_region
   }
-plaintext = aws_redshift_cluster.default.master_password
+  plaintext = aws_redshift_cluster.default.master_password
 }
 
 resource "aws_kms_alias" "lambda_alias" {
@@ -58,3 +64,12 @@ resource "aws_kms_key" "lambda_config" {
   is_enabled  = true
 }
 
+data "http" "bulk_data_schemas" {
+  url = "https://${controlshift_hostname}/api/bulk_data/schema.json"
+}
+
+data "http" "column_list" {
+  for_each = toset([for table in jsondecode(data.http.bulk_data_schemas.body)["tables"] : table["table"]["name"]])
+
+  url = "https://${controlshift_hostname}/api/bulk_data/schema/columns?table=${each.key}"
+}
