@@ -10,6 +10,23 @@ resource "aws_redshift_cluster" "default" {
   skip_final_snapshot = true
 }
 
+resource "aws_iam_role" "redshift_role" {
+  name = "RedshiftRole"
+  assume_role_policy = data.aws_iam_policy_document.redshift_assume_role.json
+}
+
+data "aws_iam_policy_document" "redshift_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+      identifiers = ["redshift.amazonaws.com"]
+    }
+  }
+}
+
+
 resource "aws_security_group" "allow_access_to_redshift_from_vpn" {
   name        = "Allow Prod VPN access to Redshift"
   description = "Allow inbound access from ControlShift VPN"

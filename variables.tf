@@ -1,7 +1,7 @@
 variable "aws_region" {
   default     = "us-east-1"
   type        = string
-  description = "The AWS Region to use. Should match the location of your Redshift instance"
+  description = "The AWS Region to use. All resources will be created in this region."
 }
 variable "redshift_password" {
   type        = string
