@@ -2,8 +2,3 @@ provider "aws" {
   version = "~> 2.0"
   region  = var.aws_region
 }
-
-provider "archive" { }
-provider "template" { }
-provider "random" { }
-provider "http" { }
