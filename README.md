@@ -56,6 +56,13 @@ redshift_schema | The name of the Redshift schema to use
 controlshift_hostname | The hostname of your ControlShift instance. Likely to be something like action.myorganization.org
 
 
+### Terraform State S3 Backend
+
+Terraform stores the current state and configuration of your infrastructure in a `terraform.tfstate` file. By default, this is stored on the local filesystem. However, teams may wish to use remote storage to facilitate collaboration. To use S3 as the remote state backend, the bucket must be created manually (ideally with versioning and encryption enabled, and public access disabled) and the bucket, key, and region values entered into `terraform.tf`.
+
+For more information, see Terraform's documentation on [State](https://www.terraform.io/docs/state/index.html) and the [S3 backend](https://www.terraform.io/docs/backends/types/s3.html).
+
+
 ### Run Terraform
 
 You'll need:
@@ -69,7 +76,7 @@ Check out a copy of this repository locally, and then in the project directory:
 
 ```bash
 # download the terraform dependencies and initialize the directory
-terraform init
+aws-vault exec bulk-data -- terraform init
 # use aws-vault to generate temporary AWS session credentials using the bulk-data profile and then use them to apply the plan
 aws-vault exec bulk-data -- terraform apply
 ```
