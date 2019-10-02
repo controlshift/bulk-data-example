@@ -49,6 +49,8 @@ receiver_bucket_name | Your S3 bucket name ingest CSVs will be stored in. Terraf
 manifest_bucket_name | Your S3 bucket name to store manifests of ingests processed in. Terraform will create this bucket for you. Must be globally unique.
 manifest_prefix | A file prefix that will be used for manifest logs on success
 failed_manifest_prefix | A file prefix that will be used for manifest logs on failure
+success_topic_name | An SNS topic name that will be notified about batch processing successes
+failure_topic_name | An SNS topic name that will be notified about batch processing failures
 redshift_database_name | The name of the Redshift database to use
 redshift_dns_name | The hostname of the Redshift instance
 redshift_port | The port on which to connect to Redshift
@@ -94,3 +96,4 @@ The pipeline logs its activity several places that are useful for debugging.
 - In DynamoDB tables for each manifest.
 - In Redshift, in the Loads tab of your datawarehouse instance. 
 - In each manifest load whose results stored in S3. 
+- Notifications are sent to the configured SNS topics for each batch processing success or failure. Add a subscription in the SNS console in AWS for the topic you want to receive notifications for (e.g., by email). The [aws-lambda-redshift-loader](https://github.com/awslabs/aws-lambda-redshift-loader) repository contains a Lambda function that can be used to automatically reprocess failed batches by subscribing the Lambda to the failure SNS topic.
