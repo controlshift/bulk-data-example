@@ -14,4 +14,5 @@ module "terraform-aws-controlshift-redshift-sync" {
   redshift_port = var.redshift_port
   redshift_schema = var.redshift_schema
   controlshift_hostname = var.controlshift_hostname
+  receiver_timeout = var.receiver_timeout
 }
