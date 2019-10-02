@@ -54,6 +54,7 @@ redshift_dns_name | The hostname of the Redshift instance
 redshift_port | The port on which to connect to Redshift
 redshift_schema | The name of the Redshift schema to use
 controlshift_hostname | The hostname of your ControlShift instance. Likely to be something like action.myorganization.org
+receiver_timeout | The timeout for the receiving Lambda, in hundredths of a second
 
 
 ### Terraform State S3 Backend
