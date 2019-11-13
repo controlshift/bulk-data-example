@@ -26,6 +26,23 @@ data "aws_iam_policy_document" "redshift_assume_role" {
   }
 }
 
+resource "aws_iam_role_policy" "redshift_loads_s3" {
+  name = "AllowsRedshiftS3Access"
+  role = aws_iam_role.redshift_role.id
+  policy = data.aws_iam_policy_document.redshift_load_policy.json
+}
+
+data "aws_iam_policy_document" "redshift_load_policy" {
+  statement {
+    effect = "Allow"
+    actions = ["s3:Get*", "s3:ListBucket"]
+    resources = [
+      "arn:aws:s3:::controlshift-redshift-load-manifests/*",
+      "arn:aws:s3:::agra-data-exports-${var.controlshift_environment}/*",
+      "arn:aws:s3:::agra-data-exports-${var.controlshift_environment}"
+    ]
+  }
+}
 
 resource "aws_security_group" "allow_access_to_redshift_from_vpn" {
   name        = "Allow Prod VPN access to Redshift"

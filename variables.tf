@@ -18,12 +18,12 @@ variable "manifest_bucket_name" {
   description = "Your S3 bucket name to store manifests of ingests processed in"
 }
 variable "manifest_prefix" {
-  default = "manifests/"
+  default = "manifests"
   type        = string
   description = "A file prefix that will be used for manifest logs on success"
 }
 variable "failed_manifest_prefix" {
-  default = "failed/"
+  default = "failed"
   type        = string
   description = "A file prefix that will be used for manifest logs on failure"
 }
@@ -32,4 +32,7 @@ variable "controlshift_hostname" {
   default = "staging.controlshiftlabs.com"
   type        = string
   description = "The hostname of your ControlShift instance. Likely to be something like action.myorganization.org"
+}
+
+variable "controlshift_environment" {
 }

@@ -10,4 +10,5 @@ module "terraform-aws-controlshift-redshift-sync" {
   redshift_database_name = aws_redshift_cluster.default.database_name
   redshift_dns_name = aws_redshift_cluster.default.dns_name
   redshift_port = aws_redshift_cluster.default.port
+  controlshift_environment = var.controlshift_environment
 }
