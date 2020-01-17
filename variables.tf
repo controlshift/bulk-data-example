@@ -17,6 +17,10 @@ variable "manifest_bucket_name" {
   type        = string
   description = "Your S3 bucket name to store manifests of ingests processed in"
 }
+variable "glue_scripts_bucket_name" {
+  type        = string
+  description = "Your S3 bucket name to store AWS Glue job scripts in in"
+}
 variable "manifest_prefix" {
   default = "manifests"
   type        = string

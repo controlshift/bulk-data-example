@@ -1,9 +1,10 @@
 module "terraform-aws-controlshift-redshift-sync" {
-  source = "controlshift/controlshift-redshift-sync/aws"
+  source = "../terraform-aws-controlshift-redshift-sync"
   redshift_username = var.redshift_username
   redshift_password = var.redshift_password
   receiver_bucket_name = var.receiver_bucket_name
   manifest_bucket_name = var.manifest_bucket_name
+  glue_scripts_bucket_name = var.glue_scripts_bucket_name
   manifest_prefix = var.manifest_prefix
   failed_manifest_prefix = var.failed_manifest_prefix
   aws_region = var.aws_region
