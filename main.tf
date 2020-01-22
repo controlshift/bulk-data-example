@@ -11,12 +11,12 @@ module "terraform-aws-controlshift-redshift-sync" {
   manifest_bucket_name = var.manifest_bucket_name
   manifest_prefix = var.manifest_prefix                                   // Default: "manifests"
   receiver_timeout = var.receiver_timeout                                 // Default: 60
-  redshift_cluster_identifier = var.redshift_cluster_identifier
-  redshift_database_name = var.redshift_database_name
+  redshift_cluster_identifier = aws_redshift_cluster.default.id
+  redshift_database_name = aws_redshift_cluster.default.database_name
   redshift_password = var.redshift_password
   redshift_schema = var.redshift_schema                                   // Default: "public"
-  redshift_security_group_id = var.redshift_security_group_id
-  redshift_subnet_id = var.redshift_subnet_id
+  redshift_security_group_id = aws_security_group.allow_access_to_redshift_from_glue.id
+  redshift_subnet_id = aws_subnet.subnet_availability_zone_1.id
   redshift_username = var.redshift_username
   success_topic_name = var.success_topic_name                             // Default: "ControlshiftLambdaLoaderSuccess"
 }

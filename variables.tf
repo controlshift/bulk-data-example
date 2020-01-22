@@ -55,15 +55,6 @@ variable "receiver_timeout" {
   description = "The timeout for the receiving Lambda, in seconds"
 }
 
-variable "redshift_cluster_identifier" {
-  type = string
-  description = "The target Redshift cluster ID"
-}
-
-variable "redshift_database_name" {
-  type = string
-}
-
 variable "redshift_password" {
   type  = string
 }
@@ -74,14 +65,10 @@ variable "redshift_schema" {
   description = "The Redshift schema to load tables into"
 }
 
-variable "redshift_security_group_id" {
-  type = string
-  description = "The security group assigned to the Redshift cluster that will be used for connecting by Glue. For requirements on this Security Group see https://docs.aws.amazon.com/glue/latest/dg/setup-vpc-for-glue-access.html"
-}
-
-variable "redshift_subnet_id" {
-  type = string
-  description = "The ID of one of Redshift's cluster subnet group that Glue will use to connect"
+variable "redshift_subnet_cidr_blocks" {
+  type = list(string)
+  description = "CIDR blocks for subnets associated with new Redshift cluster"
+  default = ["172.31.48.0/20", "172.31.64.0/20"]
 }
 
 variable "redshift_username" {
