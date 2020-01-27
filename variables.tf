@@ -38,6 +38,12 @@ variable "failure_topic_name" {
   description = "An SNS topic name that will be notified about batch processing failures"
 }
 
+variable "failure_topic_name_for_run_glue_job_lambda" {
+  default = "ControlshiftGlueJobFailure"
+  type        = string
+  description = "An SNS topic name that will be notified about batch processing failures"
+}
+
 variable "manifest_bucket_name" {
   type        = string
   description = "Your S3 bucket name to store manifests of ingests processed in"
@@ -77,6 +83,12 @@ variable "redshift_username" {
 
 variable "success_topic_name" {
   default = "ControlshiftLambdaLoaderSuccess"
+  type        = string
+  description = "An SNS topic name that will be notified about batch processing successes"
+}
+
+variable "success_topic_name_for_run_glue_job_lambda" {
+  default = "ControlshiftGlueJobSuccess"
   type        = string
   description = "An SNS topic name that will be notified about batch processing successes"
 }

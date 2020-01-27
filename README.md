@@ -48,15 +48,23 @@ correct values for your specific environment.
 
 Name | Description
 ------------ | -------------
-aws_region | The AWS Region to use. Should match the location of your Redshift instance
-redshift_username | Redshift Username to use for database loads
-redshift_password | Redshift Password to use for database loads
+aws_region | The AWS Region to use. Should match the location of your Redshift instance.
+controlshift_environment | The environment of your ControlShift instance. Either staging or production.
+controlshift_hostname | The hostname of your ControlShift instance. Likely to be something like action.myorganization.org.
+controlshift_organization_slug | The organization's slug in ControlShift platform. Ask support team (support@controlshiftlabs.com) to find this value.
+failed_manifest_prefix | A file prefix that will be used for manifest logs on failure.
+failure_topic_name | An SNS topic name that will be notified about batch processing failures.
+failure_topic_name_for_run_glue_job_lambda | An SNS topic name that will be notified about batch processing failures, defaults to `ControlshiftLambdaLoaderFailure`.
+glue_scripts_bucket_name | Your S3 bucket name to store Glue scripts in.
 manifest_bucket_name | Your S3 bucket name to store manifests of ingests processed in. Terraform will create this bucket for you. Must be globally unique.
-manifest_prefix | A file prefix that will be used for manifest logs on success
-failed_manifest_prefix | A file prefix that will be used for manifest logs on failure
-controlshift_hostname | The hostname of your ControlShift instance. Likely to be something like action.myorganization.org
-
-TODO: add new variables
+manifest_prefix | A file prefix that will be used for manifest logs on success.
+receiver_timeout | The timeout for the receiving Lambda, in seconds.
+redshift_password | Redshift Password to use for database loads.
+redshift_schema | The Redshift schema to load tables into, defaults to `public`.
+redshift_subnet_cidr_blocks | CIDR blocks for subnets associated with new Redshift cluster, defaults to `172.31.48.0/20` and `172.31.64.0/20`.
+redshift_username | Redshift Username to use for database loads.
+success_topic_name | An SNS topic name that will be notified about batch processing successes.
+success_topic_name_for_run_glue_job_lambda | An SNS topic name that will be notified about batch processing successes, defaults to `ControlshiftGlueJobSuccess`.
 
 ### Run Terraform
 
