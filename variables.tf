@@ -71,10 +71,16 @@ variable "redshift_schema" {
   description = "The Redshift schema to load tables into"
 }
 
-variable "redshift_subnet_cidr_blocks" {
-  type = list(string)
-  description = "CIDR blocks for subnets associated with new Redshift cluster"
-  default = ["172.31.48.0/20", "172.31.64.0/20"]
+variable "redshift_subnet_cidr_block" {
+  type = string
+  description = "CIDR block for subnet associated with new Redshift cluster"
+  default = "172.31.48.0/20"
+}
+
+variable "public_subnet_cidr_block" {
+  type = string
+  default = "172.31.255.0/28"
+  description = "CIDR block for the subnet with Internet access."
 }
 
 variable "redshift_username" {

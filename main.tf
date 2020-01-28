@@ -17,7 +17,7 @@ module "terraform-aws-controlshift-redshift-sync" {
   redshift_password = var.redshift_password
   redshift_schema = var.redshift_schema                                                         // Default: "public"
   redshift_security_group_id = aws_security_group.allow_access_to_redshift_from_glue.id
-  redshift_subnet_id = aws_subnet.subnet_availability_zone_1.id
+  redshift_subnet_id = aws_subnet.private_redshift_subnet_shared_with_lambdas_and_glue.id
   redshift_username = var.redshift_username
   success_topic_name = var.success_topic_name                                                   // Default: "ControlshiftLambdaLoaderSuccess"
   success_topic_name_for_run_glue_job_lambda = var.success_topic_name_for_run_glue_job_lambda   // Default: "ControlshiftGlueJobSuccess"
