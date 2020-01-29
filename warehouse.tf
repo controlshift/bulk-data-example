@@ -6,7 +6,8 @@ resource "aws_redshift_cluster" "default" {
   node_type          = "dc2.large"
   cluster_type       = "single-node"
   iam_roles = [aws_iam_role.redshift_role.arn]
-  vpc_security_group_ids = [aws_security_group.allow_access_to_redshift_from_vpn.id]
+  cluster_subnet_group_name = aws_redshift_subnet_group.default.name
+  vpc_security_group_ids = [aws_security_group.allow_access_to_redshift_from_glue.id]
   skip_final_snapshot = true
 }
 
@@ -44,17 +45,22 @@ data "aws_iam_policy_document" "redshift_load_policy" {
   }
 }
 
-resource "aws_security_group" "allow_access_to_redshift_from_vpn" {
-  name        = "Allow Prod VPN access to Redshift"
-  description = "Allow inbound access from ControlShift VPN"
+resource "aws_redshift_subnet_group" "default" {
+  name = "subnet-group-for-redshift-cluster"
+  subnet_ids = [ aws_subnet.private_redshift_subnet_shared_with_lambdas_and_glue.id ]
+}
+
+resource "aws_security_group" "allow_access_to_redshift_from_glue" {
+  name        = "Allow AWS Glue access to Redshift"
+  description = "Allow inbound access from all servers within the security group, and allow full outbound access"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
-    # TLS (change to whatever ports you need)
-    from_port   = 5439
-    to_port     = 5439
+    self        = true
+    from_port   = 0
+    to_port     = 65535
     protocol    = "TCP"
-    cidr_blocks = ["52.2.141.10/32", "0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
