@@ -21,11 +21,6 @@ variable "controlshift_organization_slug" {
   description = "The organization's slug in ControlShift platform. Ask support team (support@controlshiftlabs.com) to find this value."
 }
 
-variable "glue_scripts_bucket_name" {
-  type        = string
-  description = "Your S3 bucket name to store Glue scripts in"
-}
-
 variable "failed_manifest_prefix" {
   default = "failed"
   type        = string
@@ -44,6 +39,11 @@ variable "failure_topic_name_for_run_glue_job_lambda" {
   description = "An SNS topic name that will be notified about batch processing failures"
 }
 
+variable "glue_scripts_bucket_name" {
+  type        = string
+  description = "Your S3 bucket name to store Glue scripts in"
+}
+
 variable "manifest_bucket_name" {
   type        = string
   description = "Your S3 bucket name to store manifests of ingests processed in"
@@ -53,6 +53,12 @@ variable "manifest_prefix" {
   default = "manifests"
   type        = string
   description = "A file prefix that will be used for manifest logs on success"
+}
+
+variable "public_subnet_cidr_block" {
+  type = string
+  default = "172.31.255.0/28"
+  description = "CIDR block for the subnet with Internet access."
 }
 
 variable "receiver_timeout" {
@@ -75,12 +81,6 @@ variable "redshift_subnet_cidr_block" {
   type = string
   description = "CIDR block for subnet associated with new Redshift cluster"
   default = "172.31.48.0/20"
-}
-
-variable "public_subnet_cidr_block" {
-  type = string
-  default = "172.31.255.0/28"
-  description = "CIDR block for the subnet with Internet access."
 }
 
 variable "redshift_username" {
