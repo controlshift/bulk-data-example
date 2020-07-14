@@ -40,7 +40,7 @@ that you'll need to run to populate the tables for ingest.
 
 First generate the DDL statements, and then apply them manually in your Redshift environment.
 ```
-create_table.rb > tables.sql
+create_tables.rb > tables.sql
 ```
 
 ### Terraform Variables
@@ -60,11 +60,9 @@ failure_topic_name_for_run_glue_job_lambda | An SNS topic name that will be noti
 glue_scripts_bucket_name | Your S3 bucket name to store Glue scripts in.
 manifest_bucket_name | Your S3 bucket name to store manifests of ingests processed in. Terraform will create this bucket for you. Must be globally unique.
 manifest_prefix | A file prefix that will be used for manifest logs on success, defaults to `manifests`.
-public_subnet_cidr_block | CIDR block for public subnet with Internet Gateway for proxying outbound traffic from private subnet, defaults to `172.31.255.0/28`.
 receiver_timeout | The timeout for the receiving Lambda, in seconds, defaults to `60`.
 redshift_password | Redshift Password to use for database loads.
 redshift_schema | The Redshift schema to load tables into, defaults to `public`.
-redshift_subnet_cidr_block | CIDR block for private subnet associated with new Redshift cluster, defaults to `172.31.48.0/20`.
 redshift_username | Redshift Username to use for database loads.
 success_topic_name | An SNS topic name that will be notified about batch processing successes, defaults to `ControlshiftLambdaLoaderSuccess`.
 success_topic_name_for_run_glue_job_lambda | An SNS topic name that will be notified about batch processing successes, defaults to `ControlshiftGlueJobSuccess`.

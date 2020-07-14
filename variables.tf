@@ -55,12 +55,6 @@ variable "manifest_prefix" {
   description = "A file prefix that will be used for manifest logs on success"
 }
 
-variable "public_subnet_cidr_block" {
-  type = string
-  default = "172.31.255.0/28"
-  description = "CIDR block for the subnet with Internet access."
-}
-
 variable "receiver_timeout" {
   default = 60
   type        = number
@@ -77,11 +71,6 @@ variable "redshift_schema" {
   description = "The Redshift schema to load tables into"
 }
 
-variable "redshift_subnet_cidr_block" {
-  type = string
-  description = "CIDR block for subnet associated with new Redshift cluster"
-  default = "172.31.48.0/20"
-}
 
 variable "redshift_username" {
   type = string

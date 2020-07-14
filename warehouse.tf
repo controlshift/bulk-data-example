@@ -6,9 +6,9 @@ resource "aws_redshift_cluster" "default" {
   node_type          = "dc2.large"
   cluster_type       = "single-node"
   iam_roles = [aws_iam_role.redshift_role.arn]
-  cluster_subnet_group_name = aws_redshift_subnet_group.default.name
-  vpc_security_group_ids = [aws_security_group.allow_access_to_redshift_from_glue.id]
+  vpc_security_group_ids = [aws_security_group.allow_access_from_everywhere.id]
   skip_final_snapshot = true
+  publicly_accessible = true
 }
 
 resource "aws_iam_role" "redshift_role" {
@@ -45,28 +45,23 @@ data "aws_iam_policy_document" "redshift_load_policy" {
   }
 }
 
-resource "aws_redshift_subnet_group" "default" {
-  name = "subnet-group-for-redshift-cluster"
-  subnet_ids = [ aws_subnet.private_redshift_subnet_shared_with_lambdas_and_glue.id ]
-}
-
-resource "aws_security_group" "allow_access_to_redshift_from_glue" {
-  name        = "Allow AWS Glue access to Redshift"
-  description = "Allow inbound access from all servers within the security group, and allow full outbound access"
+// You'll probably want to customize this if you're running Redshift in production
+resource "aws_security_group" "allow_access_from_everywhere" {
+  name        = "Allow anything, anywhere to access Redshift"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
-    self        = true
     from_port   = 0
-    to_port     = 65535
-    protocol    = "TCP"
+    to_port     = 0
+    protocol    = "-1" // equivalent to all
     cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 
   egress {
     from_port       = 0
     to_port         = 0
-    protocol        = "-1"
+    protocol        = "-1" // equivalent to all
     cidr_blocks     = ["0.0.0.0/0"]
   }
 }
