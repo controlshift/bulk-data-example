@@ -10,6 +10,7 @@ module "terraform-aws-controlshift-redshift-sync" {
   failure_topic_name = var.failure_topic_name
   failure_topic_name_for_run_glue_job_lambda = var.failure_topic_name_for_run_glue_job_lambda
   glue_scripts_bucket_name = var.glue_scripts_bucket_name
+  glue_physical_connection_requirements = var.glue_physical_connection_requirements
   manifest_bucket_name = var.manifest_bucket_name
   manifest_prefix = var.manifest_prefix
   receiver_timeout = var.receiver_timeout

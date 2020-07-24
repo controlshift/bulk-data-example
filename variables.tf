@@ -71,7 +71,6 @@ variable "redshift_schema" {
   description = "The Redshift schema to load tables into"
 }
 
-
 variable "redshift_username" {
   type = string
 }
@@ -86,4 +85,13 @@ variable "success_topic_name_for_run_glue_job_lambda" {
   default = "ControlshiftGlueJobSuccess"
   type        = string
   description = "An SNS topic name that will be notified about batch processing successes"
+}
+
+variable "redshift_ingress_cidr" {
+  type        = string
+  default = "0.0.0.0/0"
+}
+
+variable "glue_physical_connection_requirements" {
+  default = null
 }
