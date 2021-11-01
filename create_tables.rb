@@ -13,7 +13,7 @@ def normalize_types(type, sql_type)
   elsif %w(datetime).include?(type)
     # Redshift timestamp column does not support precision, but some of our newer timestamp columns include it,
     # so normalize on the non-precision version
-    'timestamp without time zone'
+    'TIMESTAMP WITHOUT TIME ZONE'
   else
     sql_type
   end
