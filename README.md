@@ -113,8 +113,8 @@ We're almost there! It's time to tell ControlShift to send some bulk data over.
 
 1. Log in to ControlShift and go to Settings > Integrations > Webhooks.
 2. Make sure the "Do nightly CSV exports" and "Do incremental CSV exports" checkboxes are checked, and click the Save button.
-3. Create a new webhook endpoint with the URL from the end of Step 3.
-
+3. Create a new webhook endpoint with the URL from the end of Step 3. Be sure to open the "Advanced settings" and paste in your AWS Account ID.
+4. Contact support@controlshiftlabs.com and ask for the S3 permissions to be set up so Glue will be able to pull data from S3 buckets.
 
 Once this is done, you can use the "Test Ingest" button to send over a full set of tables. This is the same export that should automatically happen nightly when "Do nightly CSV exports" is checked.
 
