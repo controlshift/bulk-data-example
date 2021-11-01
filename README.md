@@ -31,64 +31,91 @@ The resources created include:
 - Use of [aws-vault](https://github.com/99designs/aws-vault) or a similar tool for using AWS secrets securely.
 - The `terraform` command line tool. [Download](https://www.terraform.io/downloads.html)
 
-### Setup Tables in Redshift
+### Getting Started: How To Use This Example
 
-For the ingest process to work correctly, tables that match the output of the ControlShift Bulk Data API must be setup
-in Redshift first. We've provided a create_tables.rb script that will use the [ControlShift
-Bulk Data Schema API](https://developers.controlshiftlabs.com/#bulk-data-schema) to generate `CREATE TABLE` DDL statements
-that you'll need to run to populate the tables for ingest.
+If you are starting from scratch, these steps should get you a Redshift instance with data flowing into it.
 
-First generate the DDL statements, and then apply them manually in your Redshift environment.
-```
-create_tables.rb > tables.sql
-```
+#### Step 1: Get your permissions set up
 
-### Terraform Variables
+First, we're going to make sure you have the right permissions set up to use with Terraform. These instructions assume you're using `aws-vault`.
 
-Terraform input variables are defined in variables.tf. You'll want to create your own `terraform.tfvars` file with the
-correct values for your specific environment.
+1. Locate the AWS account you'll be using. (This might be your main account, or it might be another account within your organization.)
+2. Find or create an IAM role in the account that has broad permissions. If you just created a new account in your organization, this role might already exist as "OrganizationAccountAccessRole".
+3. Make sure your AWS IAM user has permission to assume that role. This may require e.g. attaching a specific policy to your IAM user or group that allows assuming that role.
+4. Open your `$HOME/.aws/config` file and add a profile that uses that role. Make sure it's configured to use MFA as well. For the purposes of this example, we'll assume your new aws-vault profile is named `bulk-data`.
+
+Once this is done, you should be able to run `aws-vault exec bulk-data -- echo "success"` without getting an error.
+
+#### Step 2: Create a terraform.tfvars file
+
+This Terraform config has several input variables that you'll need to define based on your organization and AWS account. Make a copy of `terraform.tfvars.example`, named `terraform.tfvars`, and replace the placeholders with your settings.
+
+Here's a guide to what the variables do:
 
 Name | Description
 ------------ | -------------
-aws_region | The AWS Region to use. Should match the location of your Redshift instance, defaults to `us-east-1`.
-controlshift_environment | The environment of your ControlShift instance. Either staging or production.
-controlshift_hostname | The hostname of your ControlShift instance. Likely to be something like action.myorganization.org.
-controlshift_organization_slug | The organization's slug in ControlShift platform. Ask support team (support@controlshiftlabs.com) to find this value.
-failed_manifest_prefix | A file prefix that will be used for manifest logs on failure, defaults to `failed`.
-failure_topic_name | An SNS topic name that will be notified about batch processing failures, defaults to `ControlshiftLambdaLoaderFailure`.
-failure_topic_name_for_run_glue_job_lambda | An SNS topic name that will be notified about batch processing failures, defaults to `ControlshiftLambdaLoaderFailure`.
-glue_scripts_bucket_name | Your S3 bucket name to store Glue scripts in.
-manifest_bucket_name | Your S3 bucket name to store manifests of ingests processed in. Terraform will create this bucket for you. Must be globally unique.
-manifest_prefix | A file prefix that will be used for manifest logs on success, defaults to `manifests`.
-receiver_timeout | The timeout for the receiving Lambda, in seconds, defaults to `60`.
-redshift_password | Redshift Password to use for database loads.
-redshift_schema | The Redshift schema to load tables into, defaults to `public`.
-redshift_username | Redshift Username to use for database loads.
-success_topic_name | An SNS topic name that will be notified about batch processing successes, defaults to `ControlshiftLambdaLoaderSuccess`.
-success_topic_name_for_run_glue_job_lambda | An SNS topic name that will be notified about batch processing successes, defaults to `ControlshiftGlueJobSuccess`.
+`aws_region` | The AWS Region to use. Should match the location of your Redshift instance, defaults to `us-east-1`.
+`controlshift_environment` | The environment of your ControlShift instance. Either staging or production.
+`controlshift_hostname` | The hostname of your ControlShift instance. Likely to be something like action.myorganization.org.
+`controlshift_organization_slug` | The organization's slug in ControlShift platform. Ask support team (support@controlshiftlabs.com) to find this value.
+`failed_manifest_prefix` | A file prefix that will be used for manifest logs on failure, defaults to `failed`.
+`failure_topic_name` | An SNS topic name that will be notified about batch processing failures, defaults to `ControlshiftLambdaLoaderFailure`.
+`failure_topic_name_for_run_glue_job_lambda` | An SNS topic name that will be notified about batch processing failures, defaults to `ControlshiftLambdaLoaderFailure`.
+`glue_scripts_bucket_name` | Your S3 bucket name to store Glue scripts in.
+`manifest_bucket_name` | Your S3 bucket name to store manifests of ingests processed in. Terraform will create this bucket for you. Must be globally unique.
+`manifest_prefix` | A file prefix that will be used for manifest logs on success, defaults to `manifests`.
+`receiver_timeout` | The timeout for the receiving Lambda, in seconds, defaults to `60`.
+`redshift_password` | Redshift Password to use for database loads.
+`redshift_schema` | The Redshift schema to load tables into, defaults to `public`.
+`redshift_username` | Redshift Username to use for database loads.
+`success_topic_name` | An SNS topic name that will be notified about batch processing successes, defaults to `ControlshiftLambdaLoaderSuccess`.
+`success_topic_name_for_run_glue_job_lambda` | An SNS topic name that will be notified about batch processing successes, defaults to `ControlshiftGlueJobSuccess`.
 
-### Run Terraform
+#### Step 3: Run Terraform
 
-You'll need:
+It's time to use Terraform to create all the AWS resources! This is where the magic happens.
 
-- AWS Credentials with rather broad permissions in your environment.
-- AWS restricts certain IAM operations this terraform plan uses to credentials that have been authenticated with MFA.
-As a result using `aws-vault` or a similar tool to assume a role with the correct permissions, protected by MFA is probably necessary.
-
-Check out a copy of this repository locally, and then in the project directory:
+First, tell Terraform to set itself up:
 
 ```bash
-# download the terraform dependencies and initialize the directory
 terraform init
-# use aws-vault to generate temporary AWS session credentials using the bulk-data profile and then use them to apply the plan
+```
+
+Then, run a Terraform apply:
+
+```bash
 aws-vault exec bulk-data -- terraform apply
 ```
 
-The output of the terraform plan is a Webhook URL. You'll need to configure this in your instance of the ControlShift platform
-via Settings > Integrations > Webhooks.
+This will show you a huge diff and ask your permission to proceed. Type "yes" and wait while Terraform creates all the resources.
 
-Once the webhook is configured it should populate the tables within your Redshift instance nightly. Alternatively, you can use
-the "Test Ingest" feature to trigger a full-table refresh on demand from the ControlShift web UI.
+When it's done, Terraform will output a Webhook URL. Hang on to this, because we're going to need it in a minute.
+
+#### Step 4: Set up Tables in Redshift
+
+For the ingest process to work correctly, tables that match the output of the ControlShift Bulk Data API must be set up
+in Redshift first. We've provided a `create_tables.rb` script that will use the [ControlShift
+Bulk Data Schema API](https://developers.controlshiftlabs.com/#bulk-data-schema) to generate `CREATE TABLE` DDL statements
+that you'll need to run to populate the tables for ingest.
+
+First generate the DDL statements:
+```bash
+./create_tables.rb > tables.sql
+```
+
+Then, apply them manually in your Redshift environment.
+
+#### Step 5: Tell ControlShift to send data to your webhook URL
+
+We're almost there! It's time to tell ControlShift to send some bulk data over.
+
+1. Log in to ControlShift and go to Settings > Integrations > Webhooks.
+2. Make sure the "Do nightly CSV exports" and "Do incremental CSV exports" checkboxes are checked, and click the Save button.
+3. Create a new webhook endpoint with the URL from the end of Step 3.
+
+
+Once this is done, you can use the "Test Ingest" button to send over a full set of tables. This is the same export that should automatically happen nightly when "Do nightly CSV exports" is checked.
+
 
 ### Logs and Debugging
 
