@@ -98,12 +98,14 @@ in Redshift first. We've provided a `create_tables.rb` script that will use the 
 Bulk Data Schema API](https://developers.controlshiftlabs.com/#bulk-data-schema) to generate `CREATE TABLE` DDL statements
 that you'll need to run to populate the tables for ingest.
 
-First generate the DDL statements:
+1. First generate the DDL statements:
 ```bash
 ./create_tables.rb > tables.sql
 ```
 
-Then, apply them manually in your Redshift environment.
+2. Log in to the AWS web console and navigate to Redshift. Open the Redshift query editor for `redshift-cluster`, and connect to the `agra_replica` database using your `redshift_username` and `redshift_password`.
+
+3. Copy the contents of `tables.sql` into the editor and click the Run button. Once it's finished, you should be able to expand redshift-cluster > agra_replica > public > Tables and see a bunch of tables have been created.
 
 #### Step 5: Tell ControlShift to send data to your webhook URL
 
