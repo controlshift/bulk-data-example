@@ -1,6 +1,6 @@
 module "terraform-aws-controlshift-redshift-sync" {
   source = "controlshift/controlshift-redshift-sync/aws"
-  version = ">= 0.1.0"
+  version = ">= 0.4.0"
 
   aws_region = var.aws_region
   controlshift_environment = var.controlshift_environment
