@@ -4,7 +4,7 @@ An example of using our [Terraform](https://www.terraform.io/) module for implem
 The output of this plan is a replica of all of the tables that underlie your ControlShift instance in a new Redshift instance which allows
 for querying via SQL or other analysis.
 
-If you are already using Terraform or Redshift it is probably best to either fork this example or [use the module we provide directly in your own plan](https://registry.terraform.io/modules/controlshift/controlshift-redshift-sync/aws/)
+If you are already using Terraform or Redshift it is probably best to either fork this example or [use the module we provide directly in your own plan](https://registry.terraform.io/modules/controlshift/controlshift-redshift-sync/aws/).
 
 ### Overview
 
