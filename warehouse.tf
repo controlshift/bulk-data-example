@@ -1,3 +1,8 @@
+resource "aws_redshift_subnet_group" "all_subnets" {
+  name       = "all-subnets"
+  subnet_ids = data.aws_subnet_ids.default.ids
+}
+
 resource "aws_redshift_cluster" "default" {
   cluster_identifier = "redshift-cluster"
   database_name      = "agra_replica"
@@ -6,6 +11,7 @@ resource "aws_redshift_cluster" "default" {
   node_type          = "dc2.large"
   cluster_type       = "single-node"
   iam_roles = [aws_iam_role.redshift_role.arn]
+  cluster_subnet_group_name = aws_redshift_subnet_group.all_subnets.name
   vpc_security_group_ids = [aws_security_group.allow_access_from_everywhere.id]
   skip_final_snapshot = true
   publicly_accessible = true
