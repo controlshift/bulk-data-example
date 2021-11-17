@@ -91,7 +91,3 @@ variable "redshift_ingress_cidr" {
   type        = string
   default = "0.0.0.0/0"
 }
-
-variable "glue_physical_connection_requirements" {
-  default = null
-}
