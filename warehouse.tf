@@ -1,6 +1,6 @@
 resource "aws_redshift_subnet_group" "all_subnets" {
   name       = "all-subnets"
-  subnet_ids = data.aws_subnet_ids.default.ids
+  subnet_ids = data.aws_subnets.default.ids
 }
 
 resource "aws_redshift_cluster" "default" {
