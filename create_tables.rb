@@ -14,6 +14,8 @@ def normalize_types(type, sql_type)
     # Redshift timestamp column does not support precision, but some of our newer timestamp columns include it,
     # so normalize on the non-precision version
     'TIMESTAMP WITHOUT TIME ZONE'
+  elsif type.include?('geography')
+    'GEOGRAPHY'
   else
     sql_type
   end
