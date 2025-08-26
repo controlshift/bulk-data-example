@@ -15,6 +15,8 @@ def normalize_types(type, sql_type)
     # so normalize on the non-precision version
     'TIMESTAMP WITHOUT TIME ZONE'
   elsif type.include?('geography')
+    # Normalize column type definitions like "geography(Point,4326)" to be compatible with Redshift, which
+    # expects the type to just be "GEOGRAPHY"
     'GEOGRAPHY'
   else
     sql_type
